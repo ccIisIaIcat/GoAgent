@@ -240,20 +240,22 @@ import (
 	"os"
 
 	"github.com/ccIisIaIcat/GoAgent/agent/general"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/ConversationManager"
 )
 
 func main() {
-	fmt.Println(">>>>")
-	config, err := general.LoadConfig("LLMConfig.yaml")
+	config, err := general.LoadConfig("./LLMConfig.yaml")
 	if err != nil {
-		log.Fatalf("❌ Failed to load config: %v", err)
+		log.Fatalf("Failed to load config: %v", err)
 	}
-	manager := general.NewAgentManager()
+	agentManager := general.NewAgentManager()
 	for _, v := range config.ToProviderConfigs() {
-		if err := manager.AddProvider(v); err != nil {
-			log.Fatalf("❌ Failed to add provider: %v", err)
-		}
+		agentManager.AddProvider(v)
 	}
+	cm := ConversationManager.NewConversationManager(agentManager)
+	cm.SetSystemPrompt("Please act as a cute cat girl and answer questions in a cat girl's tone")
+
 	imageBytes, err := os.ReadFile("image.png")
 	if err != nil {
 		log.Fatalf("❌ Failed to read image file: %v", err)
@@ -261,34 +263,14 @@ func main() {
 
 	// Convert to base64
 	imageData := base64.StdEncoding.EncodeToString(imageBytes)
-	req := &general.ChatRequest{
-		Messages: []general.Message{
-			{
-				Role: general.RoleUser,
-				Content: []general.Content{
-					{
-						Type: general.ContentTypeText,
-						Text: "Please analyze the content of this image and tell me which movie it's from.",
-					},
-					{
-						Type: general.ContentTypeImageURL,
-						ImageURL: &general.ImageURL{
-							URL:    "data:image/png;base64," + imageData,
-							Detail: general.DetailHigh,
-						},
-					},
-				},
-			},
-		},
-		MaxTokens:   10000,
-		Temperature: 0.5,
-	}
-	ret, err := manager.Chat(context.Background(), general.ProviderOpenAI, req)
+	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "Analyze this image and tell me what's in it", []string{imageData}, nil)
 	if err != nil {
-		log.Fatalf("❌ Failed to chat: %v", err)
+		log.Fatalf("Failed to chat: %v", err)
 	}
+
 	fmt.Println(ret)
-	fmt.Println(ret.Choices[0].Message.Content[0].Text)
+	fmt.Println(finish_reason)
+
 }
 
 ```
