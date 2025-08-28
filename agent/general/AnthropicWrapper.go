@@ -1,8 +1,9 @@
 package general
 
 import (
-	"GoAgent/agent/anthropic"
 	"context"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/anthropic"
 )
 
 // AnthropicProviderWrapper Anthropic提供商包装器

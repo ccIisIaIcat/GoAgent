@@ -1,6 +1,6 @@
 package ConversationManager
 
-import "GoAgent/agent/general"
+import "github.com/ccIisIaIcat/GoAgent/agent/general"
 
 // SafeUnit 安全截断单元
 type SafeUnit struct {

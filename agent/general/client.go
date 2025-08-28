@@ -1,12 +1,13 @@
 package general
 
 import (
-	"GoAgent/agent/anthropic"
-	"GoAgent/agent/deepseek"
-	"GoAgent/agent/google"
-	"GoAgent/agent/openai"
 	"context"
 	"fmt"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/anthropic"
+	"github.com/ccIisIaIcat/GoAgent/agent/deepseek"
+	"github.com/ccIisIaIcat/GoAgent/agent/google"
+	"github.com/ccIisIaIcat/GoAgent/agent/openai"
 )
 
 // ProviderConfig 提供商配置

@@ -1,8 +1,9 @@
 package general
 
 import (
-	"GoAgent/agent/deepseek"
 	"context"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/deepseek"
 )
 
 // DeepSeekProviderWrapper DeepSeek提供商包装器

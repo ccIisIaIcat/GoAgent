@@ -1,8 +1,9 @@
 package general
 
 import (
-	"GoAgent/agent/openai"
 	"context"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/openai"
 )
 
 // OpenAIProviderWrapper OpenAI提供商包装器

@@ -1,9 +1,10 @@
 package ConversationManager
 
 import (
-	"GoAgent/agent/general"
 	"context"
 	"fmt"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/general"
 )
 
 // Chat 发送消息并处理回复，支持图片上传和函数调用

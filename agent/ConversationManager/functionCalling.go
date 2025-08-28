@@ -1,11 +1,12 @@
 package ConversationManager
 
 import (
-	"GoAgent/agent/general"
 	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/general"
 )
 
 // RegisterFunction 注册函数

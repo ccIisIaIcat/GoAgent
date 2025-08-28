@@ -1,8 +1,9 @@
 package ConversationManager
 
 import (
-	"GoAgent/agent/general"
 	"reflect"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/general"
 )
 
 // ConversationManager 对话管理器

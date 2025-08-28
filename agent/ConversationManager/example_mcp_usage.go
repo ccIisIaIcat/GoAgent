@@ -1,8 +1,9 @@
 package ConversationManager
 
 import (
-	"GoAgent/agent/general"
 	"log"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/general"
 )
 
 // ExampleMCPUsage 示例：如何使用MCP集成功能

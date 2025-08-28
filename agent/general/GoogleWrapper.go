@@ -1,8 +1,9 @@
 package general
 
 import (
-	"GoAgent/agent/google"
 	"context"
+
+	"github.com/ccIisIaIcat/GoAgent/agent/google"
 )
 
 // GoogleProviderWrapper Google提供商包装器
