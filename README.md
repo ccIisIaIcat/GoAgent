@@ -143,7 +143,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
+	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787加上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
