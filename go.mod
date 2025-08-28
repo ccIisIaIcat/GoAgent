@@ -1,4 +1,4 @@
-module GoAgent
+module github.com/ccIisIaIcat/GoAgent
 
 go 1.23.0
 
