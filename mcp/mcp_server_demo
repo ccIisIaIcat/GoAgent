@@ -160,3 +160,35 @@
 // 		}
 // 	}
 // }
+
+// config, err := general.LoadConfig("./LLMConfig.yaml")
+// 	if err != nil {
+// 		log.Fatalf("Failed to load config: %v", err)
+// 	}
+// 	agentManager := general.NewAgentManager()
+// 	for _, v := range config.ToProviderConfigs() {
+// 		agentManager.AddProvider(v)
+// 	}
+// 	cm := ConversationManager.NewConversationManager(agentManager)
+// 	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
+// 	fmt.Println("加载MCP配置")
+// 	if err := cm.LoadMCPConfig("./mcp/example_config.json"); err != nil {
+// 		log.Printf("加载MCP配置失败: %v", err)
+// 	}
+// 	// 确保清理资源
+// 	defer cm.CloseMCP()
+// 	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
+// 	if err != nil {
+// 		log.Fatalf("Failed to chat: %v", err)
+// 	}
+
+// 	fmt.Println(ret)
+// 	fmt.Println(finish_reason)
+
+// 	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
+// 	if err != nil {
+// 		log.Fatalf("Failed to chat: %v", err)
+// 	}
+
+// 	fmt.Println(ret)
+// 	fmt.Println(finish_reason)

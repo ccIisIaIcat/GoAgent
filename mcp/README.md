@@ -17,16 +17,8 @@ ConversationManager现已内置Model Context Protocol (MCP) 客户端功能，�
 {
   "servers": [
     {
-      "name": "file_operations",
-      "command": ["python", "servers/file_server.py"],
-      "transport": "stdio",
-      "env": {
-        "PYTHONPATH": "."
-      }
-    },
-    {
-      "name": "web_search",
-      "command": ["node", "servers/search_server.js"],
+      "name": "get_time",
+      "command": ["G:/cc/agent/agent/MCPdemo.exe"],
       "transport": "stdio"
     }
   ]
