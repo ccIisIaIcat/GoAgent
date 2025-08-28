@@ -1,0 +1,162 @@
+// type Request struct {
+// 	Jsonrpc string          `json:"jsonrpc"`
+// 	ID      interface{}     `json:"id"`
+// 	Method  string          `json:"method"`
+// 	Params  json.RawMessage `json:"params"`
+// }
+
+// type Response struct {
+// 	Jsonrpc string      `json:"jsonrpc"`
+// 	ID      interface{} `json:"id"`
+// 	Result  interface{} `json:"result,omitempty"`
+// 	Error   interface{} `json:"error,omitempty"`
+// }
+
+// type Tool struct {
+// 	Name        string      `json:"name"`
+// 	Description string      `json:"description"`
+// 	InputSchema interface{} `json:"inputSchema"`
+// }
+
+// type ServerCapabilities struct {
+// 	Tools []Tool `json:"tools"`
+// }
+
+// type ToolHandler func(params map[string]interface{}) (interface{}, error)
+
+// var toolHandlers = map[string]ToolHandler{
+// 	"get_time": func(params map[string]interface{}) (interface{}, error) {
+// 		return map[string]interface{}{
+// 			"content": []map[string]interface{}{
+// 				{"type": "text", "text": time.Now().Format(time.RFC3339)},
+// 			},
+// 		}, nil
+// 	},
+// }
+
+// func main() {
+// 	reader := bufio.NewReader(os.Stdin)
+// 	writer := bufio.NewWriter(os.Stdout)
+// 	defer writer.Flush()
+
+// 	capabilities := ServerCapabilities{
+// 		Tools: []Tool{
+// 			{
+// 				Name:        "get_time",
+// 				Description: "获取当前时间",
+// 				InputSchema: map[string]interface{}{
+// 					"type":       "object",
+// 					"properties": map[string]interface{}{},
+// 				},
+// 			},
+// 		},
+// 	}
+
+// 	for {
+// 		line, err := reader.ReadBytes('\n')
+// 		if err == io.EOF {
+// 			os.Exit(0)
+// 		}
+// 		if err != nil || len(line) == 0 {
+// 			continue
+// 		}
+
+// 		var req Request
+// 		if err := json.Unmarshal(line, &req); err != nil {
+// 			errorResp := Response{
+// 				Jsonrpc: "2.0",
+// 				ID:      nil,
+// 				Error:   map[string]interface{}{"code": -32700, "message": "Parse error"},
+// 			}
+// 			json.NewEncoder(writer).Encode(errorResp)
+// 			writer.Flush()
+// 			continue
+// 		}
+
+// 		if req.Method == "initialize" {
+// 			resp := Response{
+// 				Jsonrpc: "2.0",
+// 				ID:      req.ID,
+// 				Result: map[string]interface{}{
+// 					"protocolVersion": "2024-11-05",
+// 					"capabilities": map[string]interface{}{
+// 						"tools": map[string]interface{}{},
+// 					},
+// 					"serverInfo": map[string]interface{}{
+// 						"name":    "my-agent",
+// 						"version": "1.0.0",
+// 					},
+// 				},
+// 			}
+// 			json.NewEncoder(writer).Encode(resp)
+// 			writer.Flush()
+// 			continue
+// 		}
+
+// 		if req.ID == nil {
+// 			switch req.Method {
+// 			case "notifications/initialized":
+// 				continue
+// 			case "notifications/exit":
+// 				os.Exit(0)
+// 			}
+// 			continue
+// 		}
+
+// 		switch req.Method {
+// 		case "tools/list":
+// 			resp := Response{
+// 				Jsonrpc: "2.0",
+// 				ID:      req.ID,
+// 				Result: map[string]interface{}{
+// 					"tools": capabilities.Tools,
+// 				},
+// 			}
+// 			json.NewEncoder(writer).Encode(resp)
+// 			writer.Flush()
+// 		case "tools/call":
+// 			var params struct {
+// 				Name      string                 `json:"name"`
+// 				Arguments map[string]interface{} `json:"arguments"`
+// 			}
+// 			if err := json.Unmarshal(req.Params, &params); err != nil {
+// 				resp := Response{
+// 					Jsonrpc: "2.0",
+// 					ID:      req.ID,
+// 					Error:   map[string]interface{}{"code": -32602, "message": "Invalid params"},
+// 				}
+// 				json.NewEncoder(writer).Encode(resp)
+// 				writer.Flush()
+// 				continue
+// 			}
+
+// 			if handler, ok := toolHandlers[params.Name]; ok {
+// 				result, err := handler(params.Arguments)
+// 				resp := Response{Jsonrpc: "2.0", ID: req.ID}
+// 				if err != nil {
+// 					resp.Error = map[string]interface{}{"code": -32602, "message": err.Error()}
+// 				} else {
+// 					resp.Result = result
+// 				}
+// 				json.NewEncoder(writer).Encode(resp)
+// 				writer.Flush()
+// 			} else {
+// 				resp := Response{
+// 					Jsonrpc: "2.0",
+// 					ID:      req.ID,
+// 					Error:   map[string]interface{}{"code": -32601, "message": fmt.Sprintf("Method not found: %s", params.Name)},
+// 				}
+// 				json.NewEncoder(writer).Encode(resp)
+// 				writer.Flush()
+// 			}
+// 		default:
+// 			resp := Response{
+// 				Jsonrpc: "2.0",
+// 				ID:      req.ID,
+// 				Error:   map[string]interface{}{"code": -32601, "message": fmt.Sprintf("Method not found: %s", req.Method)},
+// 			}
+// 			json.NewEncoder(writer).Encode(resp)
+// 			writer.Flush()
+// 		}
+// 	}
+// }

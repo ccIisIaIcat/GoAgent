@@ -1,0 +1,34 @@
+# LLM 配置示例文件
+# 复制此文件为 LLMConfig.yaml 并填入实际的API密钥
+
+AgentAPIKey:
+  # OpenAI配置
+  OpenAI:
+    BaseUrl: https://api.openai.com/v1  # 官方地址，或国内代理地址
+    APIKey: your-openai-api-key-here
+    Model: gpt-4o  # 可选，默认 gpt-4o，也可用 gpt-4o-mini, gpt-3.5-turbo 等
+  
+  # Anthropic配置  
+  Anthropic:
+    BaseUrl: https://api.anthropic.com  # 官方地址，或国内代理地址
+    APIKey: your-anthropic-api-key-here
+    Model: claude-3-5-sonnet-20241022  # 可选，默认 claude-3-5-sonnet-20241022
+  
+  # DeepSeek配置
+  DeepSeek:
+    BaseUrl: https://api.deepseek.com
+    APIKey: your-deepseek-api-key-here
+    Model: deepseek-chat  # 可选，默认 deepseek-chat，也可用 deepseek-coder
+  
+  # Google配置
+  GoogleKey:
+    BaseUrl: https://generativelanguage.googleapis.com/v1beta  # 官方地址，或代理地址
+    APIKey: your-google-api-key-here
+    Model: gemini-2.5-pro  # 可选，默认 gemini-pro，也可用 gemini-pro-vision
+
+# 模型选择建议：
+# - 文本对话：OpenAI gpt-4o, Anthropic claude-3-5-sonnet, DeepSeek deepseek-chat
+# - 代码生成：OpenAI gpt-4o, DeepSeek deepseek-coder, Anthropic claude-3-5-sonnet  
+# - 多模态：OpenAI gpt-4o, Anthropic claude-3-5-sonnet, Google gemini-pro-vision
+# - 性价比：OpenAI gpt-4o-mini, DeepSeek deepseek-chat
+
