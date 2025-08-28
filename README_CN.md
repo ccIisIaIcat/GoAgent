@@ -1,59 +1,60 @@
-# Multi-Vendor LLM Agent
+# 多厂商LLM Agent
 
-This is a Golang agent that supports multiple LLM vendors, providing a unified interface to call APIs from OpenAI, Anthropic, Google, DeepSeek, and other vendors. It supports multimodal image uploads, function calling, MCP, and seamless switching between vendors during conversations.
+这是一个支持多家厂商LLM的golang agent，提供统一的接口来调用OpenAI、Anthropic、Google、DeepSeek等厂商的API，支持多模态图片上传，function calling，MCP,对话过程中无缝切换
 
-## Features
+## 特性
 
-- 🔄 **Unified Interface**: Provides a unified data structure and interface, supporting seamless switching between different vendors
-- 🛠️ **Function Calling**: Supports function calling capabilities for all vendors
-- 🖼️ **Multimodal**: Supports multimodal conversations with image input
-- 🌊 **Streaming Response**: Supports both streaming and non-streaming response modes
-- 📦 **MCP**: Supports MCP (Model Context Protocol) integration
+- 🔄 **统一接口**: 提供一套统一的数据结构和接口，支持在不同厂商间无缝切换
+- 🛠️ **函数调用**: 支持所有厂商的function calling功能
+- 🖼️ **多模态**: 支持图片输入的多模态对话
+- 🌊 **流式响应**: 支持流式和非流式两种响应模式
+- 📦 **mcp**: 支持MCP调用
 
-## Quick Start
 
-### 1. Install Dependencies
+## 快速开始
+
+### 1. 安装依赖
 
 ```bash
 go get github.com/ccIisIaIcat/GoAgent@v1.0.0
 go mod tidy
 ```
 
-### 2. Configure API Keys
+### 2. 配置API密钥
 
-Create a configuration file `LLMConfig.yaml`
+创建密钥文件 `LLMConfig.yaml` 
 
 ```yaml
 AgentAPIKey:
-  # OpenAI Configuration
+  # OpenAI配置
   OpenAI:
-    BaseUrl: https://api.openai.com/v1  # Official URL, or domestic proxy address
+    BaseUrl: https://api.openai.com/v1  # 官方地址，或国内代理地址
     APIKey: your-openai-api-key-here
-    Model: gpt-4o  # Optional, default gpt-4o, can also use gpt-4o-mini, gpt-3.5-turbo, etc.
+    Model: gpt-4o  # 可选，默认 gpt-4o，也可用 gpt-4o-mini, gpt-3.5-turbo 等
   
-  # Anthropic Configuration  
+  # Anthropic配置  
   Anthropic:
-    BaseUrl: https://api.anthropic.com  # Official URL, or domestic proxy address
+    BaseUrl: https://api.anthropic.com  # 官方地址，或国内代理地址
     APIKey: your-anthropic-api-key-here
-    Model: claude-3-5-sonnet-20241022  # Optional, default claude-3-5-sonnet-20241022
+    Model: claude-3-5-sonnet-20241022  # 可选，默认 claude-3-5-sonnet-20241022
   
-  # DeepSeek Configuration
+  # DeepSeek配置
   DeepSeek:
     BaseUrl: https://api.deepseek.com
     APIKey: your-deepseek-api-key-here
-    Model: deepseek-chat  # Optional, default deepseek-chat, can also use deepseek-coder
+    Model: deepseek-chat  # 可选，默认 deepseek-chat，也可用 deepseek-coder
   
-  # Google Configuration
+  # Google配置
   GoogleKey:
-    BaseUrl: https://generativelanguage.googleapis.com/v1beta  # Official URL, or proxy address
+    BaseUrl: https://generativelanguage.googleapis.com/v1beta  # 官方地址，或代理地址
     APIKey: your-google-api-key-here
-    Model: gemini-2.5-pro  # Optional, default gemini-pro, can also use gemini-pro-vision
+    Model: gemini-2.5-pro  # 可选，默认 gemini-pro，也可用 gemini-pro-vision
 
 ```
 
-### 3. Run Examples
+### 3. 运行示例
 
-#### Simple Conversation with Vendor Switching
+#### 简答对话，切换厂商
 ```go
 package main
 
@@ -76,8 +77,8 @@ func main() {
 		agentManager.AddProvider(v)
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
-	cm.SetSystemPrompt("Please act as a cute cat girl and answer questions in a cat girl's tone")
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "Hello", []string{}, nil)
+	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
+	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -85,7 +86,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "How was your day today?", []string{}, nil)
+	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "今天过得怎么样？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -96,9 +97,9 @@ func main() {
 
 ```
 
-#### Convenient Function Calling
+#### 便捷的函数调用
 
-You can use RegisterFunctionSimple to directly register functions to use, or use RegisterFunction to modify parameter names and descriptions
+可以使用RegisterFunctionSimple直接注册要使用的函数，也可以使用RegisterFunction对参数名称和描述进行修改
 
 ```go
 package main
@@ -118,7 +119,7 @@ func AddNumber(a, b int) int {
 }
 
 func GetWeather(city string) string {
-	return "Sunny weather"
+	return "天气晴朗"
 }
 
 func main() {
@@ -131,18 +132,18 @@ func main() {
 		agentManager.AddProvider(v)
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
-	cm.SetSystemPrompt("Please act as a cute cat girl and answer questions in a cat girl's tone")
+	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
 	cm.RegisterFunctionSimple("AddNumber", "Add two numbers", AddNumber)
 	cm.RegisterFunction("GetWeather", "Get the weather of a city", GetWeather, []string{"city"}, []string{"The city to get the weather of"})
 
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
+	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 plus 859?", []string{}, nil)
+	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787加上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -152,9 +153,9 @@ func main() {
 
 ```
 
-#### MCP Integration
+#### MCP接入
 
-Create a configuration file
+创建配置文件
 
 ```json
 {
@@ -176,7 +177,7 @@ Create a configuration file
 }
 ```
 
-Initialize ConversationManager and load MCP configuration
+初始化ConversationManager并加载MCP配置
 
 ```go
 package main
@@ -201,14 +202,14 @@ func main() {
 		agentManager.AddProvider(v)
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
-	cm.SetSystemPrompt("Please act as a cute cat girl and answer questions in a cat girl's tone")
-	fmt.Println("Loading MCP configuration")
+	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
+	fmt.Println("加载MCP配置")
 	if err := cm.LoadMCPConfig("./mcp/example_config.json"); err != nil {
-		log.Printf("Failed to load MCP configuration: %v", err)
+		log.Printf("加载MCP配置失败: %v", err)
 	}
-	// Ensure cleanup of resources
+	// 确保清理资源
 	defer cm.CloseMCP()
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
+	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -216,7 +217,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 multiplied by 859?", []string{}, nil)
+	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -227,7 +228,7 @@ func main() {
 }
 ```
 
-#### Image Analysis
+#### 图片解析
 
 ```go
 package main
@@ -259,7 +260,7 @@ func main() {
 		log.Fatalf("❌ Failed to read image file: %v", err)
 	}
 
-	// Convert to base64
+	// 转换为base64
 	imageData := base64.StdEncoding.EncodeToString(imageBytes)
 	req := &general.ChatRequest{
 		Messages: []general.Message{
@@ -268,7 +269,7 @@ func main() {
 				Content: []general.Content{
 					{
 						Type: general.ContentTypeText,
-						Text: "Please analyze the content of this image and tell me which movie it's from.",
+						Text: "请分析一下这张图片的内容，告诉我来自哪部电影。",
 					},
 					{
 						Type: general.ContentTypeImageURL,
@@ -293,27 +294,28 @@ func main() {
 
 ```
 
-## Supported Vendors
+## 支持的厂商
 
-| Vendor | Chat | Function Calling | Multimodal | Streaming |
-|--------|------|------------------|------------|-----------|
+| 厂商 | 对话 | 函数调用 | 多模态 | 流式 |
+|------|------|---------|--------|------|
 | OpenAI | ✅ | ✅ | ✅ | ✅ |
 | Anthropic | ✅ | ✅ | ✅ | ✅ |
 | Google | ✅ | ✅ | ✅ | ✅ |
 | DeepSeek | ✅ | ✅ | ❓ | ✅ |
 
-## Extending New Vendors
+## 扩展新厂商
 
-To add support for new vendors, you need to:
+要添加新的厂商支持，需要：
 
-1. Create a new vendor folder under the `agent/` directory
-2. Implement three files:
-   - `types.go`: Vendor-specific data structures
-   - `converter.go`: Conversion between unified format and vendor format
-   - `client.go`: Client implementation
-3. Add corresponding wrapper in `manager.go`
+1. 在 `agent/` 目录下创建新厂商文件夹
+2. 实现三个文件：
+   - `types.go`: 厂商特定的数据结构
+   - `converter.go`: 统一格式与厂商格式的转换
+   - `client.go`: 客户端实现
+3. 在 `manager.go` 中添加对应的包装器
 
-## Future Models to Add
+
+## 后续希望增加模型
 Grok
 Qwen
 kimi
