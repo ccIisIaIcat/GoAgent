@@ -301,7 +301,7 @@ func main() {
 | OpenAI | ✅ | ✅ | ✅ | ✅ |
 | Anthropic | ✅ | ✅ | ✅ | ✅ |
 | Google | ✅ | ✅ | ✅ | ✅ |
-| DeepSeek | ✅ | ❓ | ❓ | ✅ |
+| DeepSeek | ✅ | ✅ | ❓ | ✅ |
 
 ## 扩展新厂商
 
@@ -311,7 +311,7 @@ func main() {
 2. 实现三个文件：
    - `types.go`: 厂商特定的数据结构
    - `converter.go`: 统一格式与厂商格式的转换
-   - `client.go`: HTTP客户端实现
+   - `client.go`: 客户端实现
 3. 在 `manager.go` 中添加对应的包装器
 
 
