@@ -16,7 +16,7 @@
 ### 1. 安装依赖
 
 ```bash
-go get github.com/ccIisIaIcat/GoAgent@v1.0.0
+go get github.com/ccIisIaIcat/GoAgent@v1.0.1
 go mod tidy
 ```
 
