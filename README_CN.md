@@ -16,7 +16,7 @@
 ### 1. 安装依赖
 
 ```bash
-go get github.com/ccIisIaIcat/GoAgent@v1.0.1
+go get github.com/ccIisIaIcat/GoAgent@v1.0.2
 go env -w GOTOOLCHAIN=auto
 go mod tidy
 ```
