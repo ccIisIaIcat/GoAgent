@@ -10,7 +10,14 @@ import (
 
 // MCPConfig MCP配置文件结构
 type MCPConfig struct {
-	Servers []MCPServerConfig `json:"servers"`
+	Servers    []MCPServerConfig            `json:"servers,omitempty"`
+	McpServers map[string]MCPServerSettings `json:"mcpServers,omitempty"`
+}
+
+// MCPServerSettings MCP服务器设置（新格式）
+type MCPServerSettings struct {
+	Command string   `json:"command"`
+	Args    []string `json:"args,omitempty"`
 }
 
 // LoadMCPConfig 从文件加载MCP配置并注册服务
@@ -33,6 +40,8 @@ func (cm *ConversationManager) LoadMCPConfig(configPath string) error {
 	// 注册所有服务器
 	var errors []error
 	successCount := 0
+	
+	// 处理原有格式的servers
 	for _, serverConfig := range config.Servers {
 		if err := cm.AddMCPServer(&serverConfig); err != nil {
 			errors = append(errors, fmt.Errorf("连接服务器 %s 失败: %w", serverConfig.Name, err))
@@ -41,8 +50,26 @@ func (cm *ConversationManager) LoadMCPConfig(configPath string) error {
 			successCount++
 		}
 	}
+	
+	// 处理新格式的mcpServers
+	for serverName, settings := range config.McpServers {
+		serverConfig := MCPServerConfig{
+			Name:      serverName,
+			Command:   []string{settings.Command},
+			Args:      settings.Args,
+			Transport: "stdio",
+		}
+		
+		if err := cm.AddMCPServer(&serverConfig); err != nil {
+			errors = append(errors, fmt.Errorf("连接服务器 %s 失败: %w", serverName, err))
+			log.Printf("连接MCP服务器失败 %s: %v", serverName, err)
+		} else {
+			successCount++
+		}
+	}
 
-	log.Printf("成功连接 %d/%d 个MCP服务器", successCount, len(config.Servers))
+	totalServers := len(config.Servers) + len(config.McpServers)
+	log.Printf("成功连接 %d/%d 个MCP服务器", successCount, totalServers)
 
 	if len(errors) > 0 && successCount == 0 {
 		return fmt.Errorf("所有MCP服务器连接失败: %v", errors)
@@ -89,8 +116,13 @@ func (cm *ConversationManager) ValidateMCPConfig(config *MCPConfig) error {
 		return fmt.Errorf("配置为空")
 	}
 
+	if len(config.Servers) == 0 && len(config.McpServers) == 0 {
+		return fmt.Errorf("配置中没有定义任何服务器")
+	}
+
 	serverNames := make(map[string]bool)
 
+	// 验证原格式的servers
 	for i, server := range config.Servers {
 		if server.Name == "" {
 			return fmt.Errorf("服务器 %d 缺少名称", i)
@@ -112,6 +144,22 @@ func (cm *ConversationManager) ValidateMCPConfig(config *MCPConfig) error {
 			}
 		default:
 			return fmt.Errorf("服务器 %s: 不支持的传输类型: %s", server.Name, server.Transport)
+		}
+	}
+
+	// 验证新格式的mcpServers
+	for serverName, settings := range config.McpServers {
+		if serverName == "" {
+			return fmt.Errorf("mcpServers中存在空的服务器名称")
+		}
+
+		if serverNames[serverName] {
+			return fmt.Errorf("服务器名称重复: %s", serverName)
+		}
+		serverNames[serverName] = true
+
+		if settings.Command == "" {
+			return fmt.Errorf("服务器 %s: 缺少命令", serverName)
 		}
 	}
 

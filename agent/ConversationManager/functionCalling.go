@@ -95,10 +95,25 @@ func (cm *ConversationManager) RegisterFunction(name, description string, fn int
 			return fmt.Errorf("参数 %d 类型 %s 不受支持", i, paramType.String())
 		}
 		paramName := paramNames[i]
-		properties[paramName] = map[string]interface{}{
+		schemaProperty := map[string]interface{}{
 			"type":        ConvertToJSONSchemaType(paramType),
 			"description": paraDescriptions[i],
 		}
+		
+		// 如果是数组类型，添加items属性
+		if paramType.Kind() == reflect.Array || paramType.Kind() == reflect.Slice {
+			if paramType.Elem() != nil {
+				schemaProperty["items"] = map[string]interface{}{
+					"type": ConvertToJSONSchemaType(paramType.Elem()),
+				}
+			} else {
+				schemaProperty["items"] = map[string]interface{}{
+					"type": "string",
+				}
+			}
+		}
+		
+		properties[paramName] = schemaProperty
 		required = append(required, paramName)
 	}
 

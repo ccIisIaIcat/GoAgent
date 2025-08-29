@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/ccIisIaIcat/GoAgent/agent/general"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -315,7 +316,7 @@ func jsonSchemaTypeToGoType(schemaType string) reflect.Type {
 	}
 }
 
-// parseMCPSchema 解析MCP工具的InputSchema，如果有可选参数则返回错误
+// parseMCPSchema 解析MCP工具的InputSchema，支持可选参数
 func parseMCPSchema(schema map[string]any) ([]MCPParamInfo, error) {
 	var params []MCPParamInfo
 
@@ -336,11 +337,6 @@ func parseMCPSchema(schema map[string]any) ([]MCPParamInfo, error) {
 				requiredList[reqStr] = true
 			}
 		}
-	}
-
-	// 检查是否所有参数都是必需的
-	if len(requiredList) != len(properties) {
-		return nil, fmt.Errorf("工具包含可选参数，暂时跳过注册")
 	}
 
 	// 为了保证参数顺序一致性，先收集所有参数名并排序
@@ -378,12 +374,15 @@ func parseMCPSchema(schema map[string]any) ([]MCPParamInfo, error) {
 			description = desc
 		}
 
-		// 创建参数信息（现在所有参数都是必需的）
+		// 检查参数是否必需
+		isRequired := requiredList[paramName]
+
+		// 创建参数信息
 		paramInfo := MCPParamInfo{
 			Name:        paramName,
 			Type:        jsonSchemaTypeToGoType(paramType),
 			Description: description,
-			Required:    true, // 现在都是必需的
+			Required:    isRequired,
 		}
 
 		params = append(params, paramInfo)
@@ -407,6 +406,29 @@ func buildFunctionType(params []MCPParamInfo) reflect.Type {
 	}
 
 	return reflect.FuncOf(in, out, false)
+}
+
+// buildJSONSchemaProperty 构建JSON Schema属性对象
+func buildJSONSchemaProperty(paramType reflect.Type, description string) map[string]interface{} {
+	property := map[string]interface{}{
+		"type":        ConvertToJSONSchemaType(paramType),
+		"description": description,
+	}
+	
+	// 如果是数组类型，添加items属性
+	if paramType.Kind() == reflect.Array || paramType.Kind() == reflect.Slice {
+		if paramType.Elem() != nil {
+			property["items"] = map[string]interface{}{
+				"type": ConvertToJSONSchemaType(paramType.Elem()),
+			}
+		} else {
+			property["items"] = map[string]interface{}{
+				"type": "string",
+			}
+		}
+	}
+	
+	return property
 }
 
 // createProxyFunction 创建代理函数
@@ -440,6 +462,39 @@ func (m *MCPClientManager) createProxyFunction(toolName string, params []MCPPara
 	return reflect.MakeFunc(funcType, proxyFunc)
 }
 
+// createProxyFunctionWithOptionalParams 创建支持可选参数的代理函数
+func (m *MCPClientManager) createProxyFunctionWithOptionalParams(toolName string, allParams []MCPParamInfo, requiredParams []MCPParamInfo) reflect.Value {
+	funcType := buildFunctionType(requiredParams)
+
+	proxyFunc := func(args []reflect.Value) []reflect.Value {
+		// 将参数转换为map[string]interface{}
+		argsMap := make(map[string]interface{})
+		
+		// 首先处理必需的参数
+		for i, arg := range args {
+			if i < len(requiredParams) {
+				argsMap[requiredParams[i].Name] = arg.Interface()
+			}
+		}
+
+		// 调用MCP工具
+		result, err := m.CallTool(toolName, argsMap)
+
+		// 准备返回值
+		returnValues := make([]reflect.Value, 2)
+		returnValues[0] = reflect.ValueOf(result)
+		if err != nil {
+			returnValues[1] = reflect.ValueOf(err)
+		} else {
+			returnValues[1] = reflect.Zero(reflect.TypeOf((*error)(nil)).Elem())
+		}
+
+		return returnValues
+	}
+
+	return reflect.MakeFunc(funcType, proxyFunc)
+}
+
 // registerToolToConversationManager 将MCP工具注册到ConversationManager
 func (m *MCPClientManager) registerToolToConversationManager(toolName string, toolInfo *MCPToolInfo) error {
 	// 解析MCP工具的参数schema
@@ -448,24 +503,67 @@ func (m *MCPClientManager) registerToolToConversationManager(toolName string, to
 		return fmt.Errorf("解析MCP工具schema失败: %w", err)
 	}
 
-	// 创建动态代理函数
-	proxyFunc := m.createProxyFunction(toolName, params)
+	// 创建动态代理函数 - 只包含必需的参数
+	requiredParams := make([]MCPParamInfo, 0)
+	for _, param := range params {
+		if param.Required {
+			requiredParams = append(requiredParams, param)
+		}
+	}
 
-	// 构建参数名称和描述列表
-	paramNames := make([]string, len(params))
-	paramDescriptions := make([]string, len(params))
+	proxyFunc := m.createProxyFunction(toolName, requiredParams)
 
-	for i, param := range params {
+	// 构建参数名称和描述列表 - 只包含必需的参数
+	paramNames := make([]string, len(requiredParams))
+	paramDescriptions := make([]string, len(requiredParams))
+
+	for i, param := range requiredParams {
 		paramNames[i] = param.Name
 		paramDescriptions[i] = param.Description
 	}
 
-	// 注册到ConversationManager
-	return m.cm.RegisterFunction(
-		toolName,
-		toolInfo.Description,
-		proxyFunc.Interface(),
-		paramNames,
-		paramDescriptions,
-	)
+	// 手动创建工具定义以确保schema正确
+	return m.registerMCPToolManually(toolName, toolInfo, params, proxyFunc)
+}
+
+// registerMCPToolManually 手动注册MCP工具，确保schema正确
+func (m *MCPClientManager) registerMCPToolManually(toolName string, toolInfo *MCPToolInfo, params []MCPParamInfo, proxyFunc reflect.Value) error {
+	// 构建参数properties和required列表
+	properties := make(map[string]interface{})
+	required := make([]string, 0)
+	
+	for _, param := range params {
+		properties[param.Name] = buildJSONSchemaProperty(param.Type, param.Description)
+		if param.Required {
+			required = append(required, param.Name)
+		}
+	}
+	
+	// 创建工具定义
+	tool := general.Tool{
+		Type: "function",
+		Function: general.FunctionDefinition{
+			Name:        toolName,
+			Description: toolInfo.Description,
+			Parameters: map[string]interface{}{
+				"type":       "object",
+				"properties": properties,
+				"required":   required,
+			},
+		},
+	}
+	
+	// 构建参数名称列表（用于函数调用）
+	paramNames := make([]string, len(params))
+	for i, param := range params {
+		paramNames[i] = param.Name
+	}
+	
+	// 保存函数和工具定义
+	m.cm.registeredFuncs[toolName] = proxyFunc
+	m.cm.funcSchemas[toolName] = tool
+	m.cm.funcParamNames[toolName] = paramNames
+	m.cm.tools = append(m.cm.tools, tool)
+	
+	return nil
 }

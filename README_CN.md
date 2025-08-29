@@ -159,21 +159,21 @@ func main() {
 
 ```json
 {
-  "servers": [
-    {
-      "name": "file_operations",
-      "command": ["python", "servers/file_server.py"],
-      "transport": "stdio",
-      "env": {
-        "PYTHONPATH": "."
-      }
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated"
+      ]
     },
-    {
-      "name": "web_search",
-      "command": ["node", "servers/search_server.js"],
-      "transport": "stdio"
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-everything"
+      ]
     }
-  ]
+  }
 }
 ```
 
