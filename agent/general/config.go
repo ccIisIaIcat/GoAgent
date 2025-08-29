@@ -21,6 +21,7 @@ type LLMConfig struct {
 		Anthropic APIConfig `yaml:"Anthropic"`
 		DeepSeek  APIConfig `yaml:"DeepSeek"`
 		GoogleKey APIConfig `yaml:"GoogleKey"`
+		Qwen      APIConfig `yaml:"Qwen"`
 	} `yaml:"AgentAPIKey"`
 }
 
@@ -57,6 +58,8 @@ func getDefaultModel(provider Provider) string {
 		return "deepseek-chat"
 	case ProviderGoogle:
 		return "gemini-pro"
+	case ProviderQwen:
+		return "qwen-plus"
 	default:
 		return ""
 	}
@@ -122,6 +125,20 @@ func (c *LLMConfig) ToProviderConfigs() []*ProviderConfig {
 		})
 	}
 
+	// Qwen(阿里云)配置
+	if c.AgentAPIKey.Qwen.APIKey != "" {
+		model := c.AgentAPIKey.Qwen.Model
+		if model == "" {
+			model = getDefaultModel(ProviderQwen)
+		}
+		configs = append(configs, &ProviderConfig{
+			Provider: ProviderQwen,
+			APIKey:   c.AgentAPIKey.Qwen.APIKey,
+			BaseURL:  c.AgentAPIKey.Qwen.BaseUrl,
+			Model:    model,
+		})
+	}
+
 	return configs
 }
 
@@ -171,6 +188,17 @@ func (c *LLMConfig) PrintConfig() {
 			c.AgentAPIKey.GoogleKey.BaseUrl,
 			model,
 			maskAPIKey(c.AgentAPIKey.GoogleKey.APIKey))
+	}
+
+	if c.AgentAPIKey.Qwen.APIKey != "" {
+		model := c.AgentAPIKey.Qwen.Model
+		if model == "" {
+			model = getDefaultModel(ProviderQwen)
+		}
+		fmt.Printf("Qwen(Ali): %s | Model: %s | Key: %s...\n",
+			c.AgentAPIKey.Qwen.BaseUrl,
+			model,
+			maskAPIKey(c.AgentAPIKey.Qwen.APIKey))
 	}
 
 	fmt.Println("========================")

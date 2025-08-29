@@ -128,6 +128,7 @@ const (
 	ProviderAnthropic Provider = "anthropic"
 	ProviderGoogle    Provider = "google"
 	ProviderDeepSeek  Provider = "deepseek"
+	ProviderQwen      Provider = "qwen"
 )
 
 // LLMProvider 统一LLM提供商接口

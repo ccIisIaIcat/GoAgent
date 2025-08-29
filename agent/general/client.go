@@ -8,6 +8,7 @@ import (
 	"github.com/ccIisIaIcat/GoAgent/agent/deepseek"
 	"github.com/ccIisIaIcat/GoAgent/agent/google"
 	"github.com/ccIisIaIcat/GoAgent/agent/openai"
+	"github.com/ccIisIaIcat/GoAgent/agent/qwen"
 )
 
 // ProviderConfig 提供商配置
@@ -64,6 +65,14 @@ func (m *AgentManager) AddProvider(config *ProviderConfig) error {
 			Model:   config.Model,
 		})
 		m.providers[ProviderDeepSeek] = &DeepSeekProviderWrapper{client: client}
+
+	case ProviderQwen:
+		client := qwen.NewClient(&qwen.Config{
+			APIKey:  config.APIKey,
+			BaseURL: config.BaseURL,
+			Model:   config.Model,
+		})
+		m.providers[ProviderQwen] = &QwenProviderWrapper{client: client}
 
 	default:
 		return fmt.Errorf("unsupported provider: %s", config.Provider)
