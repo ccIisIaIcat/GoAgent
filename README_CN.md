@@ -17,6 +17,7 @@
 
 ```bash
 go get github.com/ccIisIaIcat/GoAgent@v1.0.1
+go env -w GOTOOLCHAIN=auto
 go mod tidy
 ```
 
