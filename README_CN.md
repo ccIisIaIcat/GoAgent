@@ -285,6 +285,7 @@ func main() {
 | Anthropic | ✅ | ✅ | ✅ | ✅ |
 | Google | ✅ | ✅ | ✅ | ✅ |
 | DeepSeek | ✅ | ✅ | ❓ | ✅ |
+| Qwen | ✅ | ✅ | ❓ | ✅ |
 
 ## 扩展新厂商
 
@@ -300,6 +301,5 @@ func main() {
 
 ## 后续希望增加模型
 Grok
-Qwen
 kimi
 llama

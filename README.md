@@ -284,6 +284,7 @@ func main() {
 | Anthropic | ✅ | ✅ | ✅ | ✅ |
 | Google | ✅ | ✅ | ✅ | ✅ |
 | DeepSeek | ✅ | ✅ | ❓ | ✅ |
+| Qwen | ✅ | ✅ | ❓ | ✅ |
 
 ## Extending New Vendors
 
@@ -298,6 +299,5 @@ To add support for new vendors, you need to:
 
 ## Future Models to Add
 Grok
-Qwen
 kimi
 llama
