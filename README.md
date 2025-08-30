@@ -15,7 +15,7 @@ This is a Golang agent that supports multiple LLM vendors, providing a unified i
 ### 1. Install Dependencies
 
 ```bash
-go get github.com/ccIisIaIcat/GoAgent@v1.0.2
+go get github.com/ccIisIaIcat/GoAgent@v1.0.3
 go env -w GOTOOLCHAIN=auto
 go mod tidy
 ```

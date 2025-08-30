@@ -88,6 +88,11 @@ func (cm *ConversationManager) AddMessage(role general.MessageRole, content []ge
 	})
 }
 
+// AddFullMessage 添加完整的消息到历史记录（包括ToolCalls和Name）
+func (cm *ConversationManager) AddFullMessage(message general.Message) {
+	cm.history = append(cm.history, message)
+}
+
 // GetHistory 获取对话历史
 func (cm *ConversationManager) GetHistory() []general.Message {
 	return cm.history
