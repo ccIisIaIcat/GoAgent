@@ -8,7 +8,7 @@ import (
 )
 
 // Chat 发送消息并处理回复，支持图片上传和函数调用
-func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provider, userMessage string, imageBase64s []string, info_chan chan general.Message) ([]general.Message, string, error) {
+func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provider, userMessage string, imageBase64s []string, info_chan chan general.Message) ([]general.Message, string, error, *general.Usage) {
 	// 在处理用户请求开始时进行历史截断（仅一次，在添加新消息之前）
 	cm.history = cm.truncateHistory(cm.history)
 	stop_reason := "success"
@@ -85,8 +85,24 @@ func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provid
 		// 发送请求
 		resp, err := cm.manager.Chat(ctx, provider, req)
 		if err != nil {
-			return nil, "", fmt.Errorf("chat failed: %w", err)
+			return nil, "", fmt.Errorf("chat failed: %w", err), nil
 		}
+
+		// 跟踪token使用量
+		if cm.LastUsage == nil {
+			cm.LastUsage = &general.Usage{}
+		}
+		if cm.TotalUsage == nil {
+			cm.TotalUsage = &general.Usage{}
+		}
+
+		// 更新最后一次使用量
+		*cm.LastUsage = resp.Usage
+
+		// 累加到总使用量
+		cm.TotalUsage.PromptTokens += resp.Usage.PromptTokens
+		cm.TotalUsage.CompletionTokens += resp.Usage.CompletionTokens
+		cm.TotalUsage.TotalTokens += resp.Usage.TotalTokens
 
 		// 添加助手回复到历史
 		if len(resp.Choices) > 0 {
@@ -111,7 +127,7 @@ func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provid
 					// 超过阈值，执行最后一次工具调用但不发送，直接退出循环
 					if err := cm.HandleToolCall(ctx, provider, toolCall, info_chan); err != nil {
 						stop_reason = "error"
-						return nil, stop_reason, fmt.Errorf("函数调用失败: %w", err)
+						return nil, stop_reason, fmt.Errorf("函数调用失败: %w", err), nil
 					}
 					// 设置退出标志，保持对话结构完整
 					shouldExit = true
@@ -121,7 +137,7 @@ func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provid
 
 				if err := cm.HandleToolCall(ctx, provider, toolCall, info_chan); err != nil {
 					stop_reason = "error"
-					return nil, stop_reason, fmt.Errorf("函数调用失败: %w", err)
+					return nil, stop_reason, fmt.Errorf("函数调用失败: %w", err), nil
 				}
 			}
 
@@ -132,5 +148,5 @@ func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provid
 	}
 	// 执行成功，标记成功
 	success = true
-	return cm.history[HistoryLength:], stop_reason, nil
+	return cm.history[HistoryLength:], stop_reason, nil, cm.TotalUsage
 }

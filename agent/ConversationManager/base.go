@@ -22,6 +22,8 @@ type ConversationManager struct {
 	MaxHistoryTokens       int                 //最大历史记录token数量（用于截断）
 	EnableTruncation       bool                //是否启用历史截断
 	mcpManager             *MCPClientManager   // MCP客户端管理器
+	LastUsage              *general.Usage      // 最后一次调用的token使用量
+	TotalUsage             *general.Usage      // 累计token使用量
 }
 
 // NewConversationManager 创建新的对话管理器

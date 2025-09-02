@@ -9,6 +9,7 @@ This is a Golang agent that supports multiple LLM vendors, providing a unified i
 - 🖼️ **Multimodal**: Supports multimodal conversations with image input
 - 🌊 **Streaming Response**: Supports both streaming and non-streaming response modes
 - 📦 **MCP**: Supports MCP (Model Context Protocol) integration
+- 📊 **Token Statistics**: Supports detailed Token usage statistics, including prompt, completion, and total Token counts
 
 ## Quick Start
 
@@ -264,13 +265,21 @@ func main() {
 
 	// Convert to base64
 	imageData := base64.StdEncoding.EncodeToString(imageBytes)
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "Analyze this image and tell me what's in it", []string{imageData}, nil)
+	ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "Analyze this image and tell me what's in it", []string{imageData}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
+	
+	// Display Token usage statistics
+	if usage != nil {
+		fmt.Printf("Token Usage Statistics:\n")
+		fmt.Printf("  Prompt Tokens: %d\n", usage.PromptTokens)
+		fmt.Printf("  Completion Tokens: %d\n", usage.CompletionTokens)
+		fmt.Printf("  Total Tokens: %d\n", usage.TotalTokens)
+	}
 
 }
 
@@ -285,6 +294,37 @@ func main() {
 | Google | ✅ | ✅ | ✅ | ✅ |
 | DeepSeek | ✅ | ✅ | ❓ | ✅ |
 | Qwen | ✅ | ✅ | ❓ | ✅ |
+
+## Token Usage Statistics
+
+GoAgent supports detailed Token usage statistics to help developers monitor and optimize API call costs.
+
+### Statistics Include
+
+- **Prompt Tokens**: Number of Tokens consumed by input prompts
+- **Completion Tokens**: Number of Tokens consumed by model responses
+- **Total Tokens**: Total Token consumption for a single conversation
+
+### Usage
+
+```go
+ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "Hello", []string{}, nil)
+if err != nil {
+    log.Fatalf("Failed to chat: %v", err)
+}
+
+// Display Token usage statistics
+if usage != nil {
+    fmt.Printf("Token Usage Statistics:\n")
+    fmt.Printf("  Prompt Tokens: %d\n", usage.PromptTokens)
+    fmt.Printf("  Completion Tokens: %d\n", usage.CompletionTokens)
+    fmt.Printf("  Total Tokens: %d\n", usage.TotalTokens)
+}
+```
+
+### Cumulative Statistics
+
+For continuous conversations, the `usage` parameter returns cumulative Token usage, making it easy to track the cost of the entire session.
 
 ## Extending New Vendors
 

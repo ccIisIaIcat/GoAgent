@@ -9,6 +9,7 @@
 - 🖼️ **多模态**: 支持图片输入的多模态对话
 - 🌊 **流式响应**: 支持流式和非流式两种响应模式
 - 📦 **mcp**: 支持MCP调用
+- 📊 **Token统计**: 支持详细的Token使用量统计，包括提示词、完成和总Token数量
 
 
 ## 快速开始
@@ -265,13 +266,21 @@ func main() {
 
 	// Convert to base64
 	imageData := base64.StdEncoding.EncodeToString(imageBytes)
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "分析这张图片，并告诉我图片中有什么", []string{imageData}, nil)
+	ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "分析这张图片，并告诉我图片中有什么", []string{imageData}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
+	
+	// 显示Token使用量统计
+	if usage != nil {
+		fmt.Printf("Token使用量统计:\n")
+		fmt.Printf("  提示词Tokens: %d\n", usage.PromptTokens)
+		fmt.Printf("  完成Tokens: %d\n", usage.CompletionTokens)
+		fmt.Printf("  总Tokens: %d\n", usage.TotalTokens)
+	}
 
 }
 
@@ -286,6 +295,37 @@ func main() {
 | Google | ✅ | ✅ | ✅ | ✅ |
 | DeepSeek | ✅ | ✅ | ❓ | ✅ |
 | Qwen | ✅ | ✅ | ❓ | ✅ |
+
+## Token使用量统计
+
+GoAgent支持详细的Token使用量统计，帮助开发者监控和优化API调用成本。
+
+### 统计信息包含
+
+- **提示词Tokens**: 输入提示词消耗的Token数量
+- **完成Tokens**: 模型回复消耗的Token数量  
+- **总Tokens**: 单次对话的总Token消耗
+
+### 使用方法
+
+```go
+ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
+if err != nil {
+    log.Fatalf("Failed to chat: %v", err)
+}
+
+// 显示Token使用量统计
+if usage != nil {
+    fmt.Printf("Token使用量统计:\n")
+    fmt.Printf("  提示词Tokens: %d\n", usage.PromptTokens)
+    fmt.Printf("  完成Tokens: %d\n", usage.CompletionTokens)
+    fmt.Printf("  总Tokens: %d\n", usage.TotalTokens)
+}
+```
+
+### 累计统计
+
+对于连续对话，`usage`参数会返回累计的Token使用量，方便跟踪整个会话的成本。
 
 ## 扩展新厂商
 
