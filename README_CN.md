@@ -80,7 +80,7 @@ func main() {
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
 	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
+	ret, finish_reason, err,_ := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -88,7 +88,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "今天过得怎么样？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "今天过得怎么样？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -138,14 +138,14 @@ func main() {
 	cm.RegisterFunctionSimple("AddNumber", "Add two numbers", AddNumber)
 	cm.RegisterFunction("GetWeather", "Get the weather of a city", GetWeather, []string{"city"}, []string{"The city to get the weather of"})
 
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787加上859等于多少？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787加上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -211,7 +211,7 @@ func main() {
 	}
 	// 确保清理资源
 	defer cm.CloseMCP()
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -219,7 +219,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}

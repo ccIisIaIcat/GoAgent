@@ -40,7 +40,7 @@ func (cm *ConversationManager) LoadMCPConfig(configPath string) error {
 	// 注册所有服务器
 	var errors []error
 	successCount := 0
-	
+
 	// 处理原有格式的servers
 	for _, serverConfig := range config.Servers {
 		if err := cm.AddMCPServer(&serverConfig); err != nil {
@@ -50,7 +50,7 @@ func (cm *ConversationManager) LoadMCPConfig(configPath string) error {
 			successCount++
 		}
 	}
-	
+
 	// 处理新格式的mcpServers
 	for serverName, settings := range config.McpServers {
 		serverConfig := MCPServerConfig{
@@ -59,7 +59,7 @@ func (cm *ConversationManager) LoadMCPConfig(configPath string) error {
 			Args:      settings.Args,
 			Transport: "stdio",
 		}
-		
+
 		if err := cm.AddMCPServer(&serverConfig); err != nil {
 			errors = append(errors, fmt.Errorf("连接服务器 %s 失败: %w", serverName, err))
 			log.Printf("连接MCP服务器失败 %s: %v", serverName, err)
@@ -218,23 +218,23 @@ func (cm *ConversationManager) AddMCPServerFromJSON(jsonStr string) error {
 func (cm *ConversationManager) GetMCPServerStatus() map[string]interface{} {
 	if cm.mcpManager == nil {
 		return map[string]interface{}{
-			"enabled":       false,
-			"servers":       0,
-			"tools":         0,
+			"enabled": false,
+			"servers": 0,
+			"tools":   0,
 		}
 	}
 
 	tools := cm.mcpManager.GetRegisteredTools()
 	serverMap := make(map[string]int)
-	
+
 	for _, tool := range tools {
 		serverMap[tool.ServerName]++
 	}
 
 	return map[string]interface{}{
-		"enabled":       true,
-		"servers":       len(serverMap),
-		"tools":         len(tools),
-		"server_tools":  serverMap,
+		"enabled":      true,
+		"servers":      len(serverMap),
+		"tools":        len(tools),
+		"server_tools": serverMap,
 	}
 }

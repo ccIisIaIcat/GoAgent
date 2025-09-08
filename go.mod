@@ -2,7 +2,6 @@ module github.com/ccIisIaIcat/GoAgent
 
 go 1.23.0
 
-toolchain go1.24.6
 
 require (
 	github.com/modelcontextprotocol/go-sdk v0.3.0

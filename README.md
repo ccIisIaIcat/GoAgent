@@ -79,7 +79,7 @@ func main() {
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
 	cm.SetSystemPrompt("Please act as a cute cat girl and answer questions in a cat girl's tone")
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "Hello", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "Hello", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -87,7 +87,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "How was your day today?", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "How was your day today?", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -137,14 +137,14 @@ func main() {
 	cm.RegisterFunctionSimple("AddNumber", "Add two numbers", AddNumber)
 	cm.RegisterFunction("GetWeather", "Get the weather of a city", GetWeather, []string{"city"}, []string{"The city to get the weather of"})
 
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 plus 859?", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 plus 859?", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -210,7 +210,7 @@ func main() {
 	}
 	// Ensure cleanup of resources
 	defer cm.CloseMCP()
-	ret, finish_reason, err := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "What time is it now?", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -218,7 +218,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 multiplied by 859?", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "What is 787 multiplied by 859?", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
