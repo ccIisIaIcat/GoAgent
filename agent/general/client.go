@@ -21,6 +21,7 @@ type ProviderConfig struct {
 
 // AgentManager 智能体管理器
 type AgentManager struct {
+	PC        ProviderConfig
 	providers map[Provider]LLMProvider
 }
 

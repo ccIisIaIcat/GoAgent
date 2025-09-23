@@ -8,7 +8,7 @@ import (
 )
 
 // Chat 发送消息并处理回复，支持图片上传和函数调用
-func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provider, userMessage string, imageBase64s []string, info_chan chan general.Message) ([]general.Message, string, error, *general.Usage) {
+func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provider, model string, userMessage string, imageBase64s []string, info_chan chan general.Message) ([]general.Message, string, error, *general.Usage) {
 	// 在处理用户请求开始时进行历史截断（仅一次，在添加新消息之前）
 	cm.history = cm.truncateHistory(cm.history)
 	stop_reason := "success"
@@ -80,6 +80,7 @@ func (cm *ConversationManager) Chat(ctx context.Context, provider general.Provid
 			SystemPrompt: cm.systemPrompt,
 			MaxTokens:    cm.MaxTokens,
 			Temperature:  cm.Temperature,
+			Model:        model,
 		}
 
 		// 发送请求

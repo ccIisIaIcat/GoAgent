@@ -46,6 +46,10 @@ func NewConversationManager(manager *general.AgentManager) *ConversationManager 
 	return cm
 }
 
+func (cm *ConversationManager) GetManager() *general.AgentManager {
+	return cm.manager
+}
+
 func (cm *ConversationManager) SetMaxChatNums(maxChatNums int) {
 	cm.MaxChatNums = maxChatNums
 }

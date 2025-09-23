@@ -17,7 +17,7 @@
 ### 1. 安装依赖
 
 ```bash
-go get github.com/ccIisIaIcat/GoAgent@v1.0.4
+go get github.com/ccIisIaIcat/GoAgent@v1.0.5
 go env -w GOTOOLCHAIN=auto
 go mod tidy
 ```
@@ -80,7 +80,7 @@ func main() {
 	}
 	cm := ConversationManager.NewConversationManager(agentManager)
 	cm.SetSystemPrompt("请扮演一只可爱的猫娘，用猫娘的语气回答问题")
-	ret, finish_reason, err,_ := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
+	ret, finish_reason, err,_ := cm.Chat(context.Background(), general.ProviderOpenAI, "gpt-4o", "你好", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -88,7 +88,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "今天过得怎么样？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "deepseek-chat", "今天过得怎么样？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -138,14 +138,14 @@ func main() {
 	cm.RegisterFunctionSimple("AddNumber", "Add two numbers", AddNumber)
 	cm.RegisterFunction("GetWeather", "Get the weather of a city", GetWeather, []string{"city"}, []string{"The city to get the weather of"})
 
-	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "gpt-4o", "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787加上859等于多少？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "deepseek-chat", "请问787加上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -211,7 +211,7 @@ func main() {
 	}
 	// 确保清理资源
 	defer cm.CloseMCP()
-	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "请问现在几点了", []string{}, nil)
+	ret, finish_reason, err,_  := cm.Chat(context.Background(), general.ProviderOpenAI, "gpt-4o", "请问现在几点了", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -219,7 +219,7 @@ func main() {
 	fmt.Println(ret)
 	fmt.Println(finish_reason)
 
-	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "请问787乘上859等于多少？", []string{}, nil)
+	ret, finish_reason, err,_  = cm.Chat(context.Background(), general.ProviderDeepSeek, "deepseek-chat", "请问787乘上859等于多少？", []string{}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -266,7 +266,7 @@ func main() {
 
 	// Convert to base64
 	imageData := base64.StdEncoding.EncodeToString(imageBytes)
-	ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "分析这张图片，并告诉我图片中有什么", []string{imageData}, nil)
+	ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "gpt-4o", "分析这张图片，并告诉我图片中有什么", []string{imageData}, nil)
 	if err != nil {
 		log.Fatalf("Failed to chat: %v", err)
 	}
@@ -309,7 +309,7 @@ GoAgent支持详细的Token使用量统计，帮助开发者监控和优化API�
 ### 使用方法
 
 ```go
-ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "你好", []string{}, nil)
+ret, finish_reason, err, usage := cm.Chat(context.Background(), general.ProviderOpenAI, "gpt-4o", "你好", []string{}, nil)
 if err != nil {
     log.Fatalf("Failed to chat: %v", err)
 }
